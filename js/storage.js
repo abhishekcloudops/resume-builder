@@ -13,6 +13,31 @@ const StorageManager = (() => {
    */
   function getDefaults() {
     return {
+      documentTitle: 'My Resume',
+      personal: {
+        fullName: '',
+        jobTitle: '',
+        email: '',
+        phone: '',
+        address: '',
+        website: '',
+        linkedin: '',
+        github: '',
+        photo: ''
+      },
+      summary: '',
+      skills: [],
+      experience: [],
+      education: [],
+      projects: [],
+      certifications: [],
+      languages: [],
+      social: []
+    };
+  }
+
+  function getSampleData() {
+    return {
       personal: {
         fullName: 'Ankita Kumari',
         jobTitle: 'Supply Chain & Logistics Specialist',
@@ -120,6 +145,7 @@ const StorageManager = (() => {
       // Merge with defaults to ensure all keys exist
       const defaults = getDefaults();
       return {
+        documentTitle: parsed.documentTitle || 'My Resume',
         personal: { ...defaults.personal, ...(parsed.personal || {}) },
         summary: parsed.summary || '',
         skills: Array.isArray(parsed.skills) ? parsed.skills : [],
@@ -229,6 +255,7 @@ const StorageManager = (() => {
 
   return {
     getDefaults,
+    getSampleData,
     saveData,
     loadData,
     saveTemplate,

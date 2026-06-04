@@ -116,10 +116,18 @@ const PDFGenerator = (() => {
 
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, printW, printH, undefined, 'FAST');
 
-      // Use person's name for the filename if available
+      // Use document title if available, otherwise fallback to name
+      const data = StorageManager.loadData();
       const nameEl = resumeEl.querySelector('h1');
-      const name = nameEl ? nameEl.textContent.trim().replace(/\s+/g, '_') : 'resume';
-      pdf.save(`${name}_Resume.pdf`);
+      let filename = 'resume';
+      if (data && data.documentTitle && data.documentTitle !== 'My Resume') {
+        filename = data.documentTitle.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+      } else if (nameEl && nameEl.textContent.trim() && nameEl.textContent.trim() !== 'Your Name') {
+        filename = nameEl.textContent.trim().replace(/\s+/g, '_') + '_Resume';
+      } else if (data && data.documentTitle) {
+        filename = data.documentTitle.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+      }
+      pdf.save(`${filename}.pdf`);
 
     } catch (err) {
       console.error('PDF generation failed:', err);

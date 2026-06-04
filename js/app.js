@@ -51,6 +51,23 @@
     bindFormEvents();
     bindPhotoUpload();
     bindSkillsInput();
+
+    // SaaS additions
+    initSidebarTabs();
+    initSidebarToolbar();
+    initOnboarding();
+    initAtsModal();
+
+    // Set initial doc title value
+    const docTitleInput = $('#docTitle');
+    if (docTitleInput) {
+      docTitleInput.value = resumeData.documentTitle || 'My Resume';
+      docTitleInput.addEventListener('input', () => {
+        resumeData.documentTitle = docTitleInput.value.trim() || 'My Resume';
+        onDataChange();
+      });
+    }
+
     pushUndoState(); // initial state
   }
 
@@ -155,6 +172,12 @@
     if (ringMobile) ringMobile.setAttribute('stroke-dasharray', `${score}, 100`);
     if (valueMobile) valueMobile.textContent = score;
 
+    // Update modal ring
+    const ringModal = $('#atsRingFgModalAts');
+    const valueModal = $('#atsValueModalAts');
+    if (ringModal) ringModal.setAttribute('stroke-dasharray', `${score}, 100`);
+    if (valueModal) valueModal.textContent = score;
+
     // Color by score
     let color = '#ef4444';
     if (score >= 70) color = '#10B981';
@@ -162,6 +185,257 @@
     
     if (ring) ring.style.stroke = color;
     if (ringMobile) ringMobile.style.stroke = color;
+    if (ringModal) ringModal.style.stroke = color;
+
+    // Modal Label
+    const scoreLabel = $('#atsScoreLabel');
+    if (scoreLabel) {
+      if (score >= 70) {
+        scoreLabel.innerHTML = 'ATS Score: <span style="color:#10B981">Excellent</span>';
+      } else if (score >= 40) {
+        scoreLabel.innerHTML = 'ATS Score: <span style="color:#f59e0b">Good</span>';
+      } else {
+        scoreLabel.innerHTML = 'ATS Score: <span style="color:#ef4444">Needs Improvement</span>';
+      }
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────
+     ATS MODAL CHECKLIST RENDERING & ACTIONS
+     ───────────────────────────────────────────────────── */
+  function initAtsModal() {
+    const modal = $('#atsModal');
+    const closeBtn = $('#closeAtsModal');
+    const openBtn = $('#atsBadge');
+    const openBtnMobile = $('#atsBadgeMobile');
+
+    if (!modal) return;
+
+    const openModal = () => {
+      renderATSChecklist();
+      modal.classList.add('active');
+    };
+
+    openBtn?.addEventListener('click', openModal);
+    openBtnMobile?.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  }
+
+  function renderATSChecklist() {
+    const container = $('#atsChecklist');
+    if (!container) return;
+
+    const checklist = [];
+    const p = resumeData.personal;
+
+    // Contact info checks
+    if (!p.fullName) {
+      checklist.push({
+        status: 'danger',
+        title: 'Full Name is missing',
+        tip: 'Recruiters need to know who you are. Add your full name.',
+        tab: 'personal',
+        focus: 'fullName'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: 'Full Name provided',
+        tip: 'Great! Your name is clearly stated.'
+      });
+    }
+
+    if (!p.email) {
+      checklist.push({
+        status: 'danger',
+        title: 'Email address is missing',
+        tip: 'Add a professional email address (e.g. john.doe@example.com).',
+        tab: 'personal',
+        focus: 'email'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: 'Email address provided',
+        tip: 'Recruiters can easily contact you.'
+      });
+    }
+
+    if (!p.phone) {
+      checklist.push({
+        status: 'warning',
+        title: 'Phone number is missing',
+        tip: 'Consider adding your phone number for quick screening calls.',
+        tab: 'personal',
+        focus: 'phone'
+      });
+    }
+
+    if (!p.linkedin) {
+      checklist.push({
+        status: 'warning',
+        title: 'LinkedIn profile is missing',
+        tip: '90%+ of recruiters search candidates on LinkedIn. Add your profile link.',
+        tab: 'personal',
+        focus: 'linkedin'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: 'LinkedIn profile linked',
+        tip: 'Good job keeping your online presence professional.'
+      });
+    }
+
+    // Summary checks
+    if (!resumeData.summary) {
+      checklist.push({
+        status: 'warning',
+        title: 'Professional Summary is missing',
+        tip: 'A short profile summary helps hook hiring managers in 6 seconds.',
+        tab: 'summary',
+        focus: 'summary'
+      });
+    } else if (resumeData.summary.length < 80) {
+      checklist.push({
+        status: 'warning',
+        title: 'Summary is too short',
+        tip: 'Write at least 80 characters describing your skills and career goals.',
+        tab: 'summary',
+        focus: 'summary'
+      });
+    } else if (resumeData.summary.length > 400) {
+      checklist.push({
+        status: 'warning',
+        title: 'Summary is too long',
+        tip: 'Keep your summary concise (under 400 chars) so it fits on one page.',
+        tab: 'summary',
+        focus: 'summary'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: 'Professional Summary is optimized',
+        tip: 'Your summary provides a concise overview of your profile.'
+      });
+    }
+
+    // Work experience checks
+    const expCount = resumeData.experience.length;
+    if (expCount === 0) {
+      checklist.push({
+        status: 'danger',
+        title: 'No Work Experience listed',
+        tip: 'Work history is the most critical part of an ATS scan. Add at least one entry.',
+        tab: 'experience',
+        focus: 'fullName' // Focus fullName in personal as generic input focus
+      });
+    } else if (expCount < 2) {
+      checklist.push({
+        status: 'warning',
+        title: 'Only 1 Work Experience entry',
+        tip: 'Consider adding more experience entries if you have prior work history.',
+        tab: 'experience',
+        focus: 'fullName'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: `Work History is detailed (${expCount} entries)`,
+        tip: 'Great depth of work history to showcase.'
+      });
+    }
+
+    // Skills checks
+    const skillCount = resumeData.skills.length;
+    if (skillCount === 0) {
+      checklist.push({
+        status: 'danger',
+        title: 'No Skills listed',
+        tip: 'ATS matches candidate resumes by keyword. List at least 5 skills.',
+        tab: 'skills',
+        focus: 'skillInput'
+      });
+    } else if (skillCount < 5) {
+      checklist.push({
+        status: 'warning',
+        title: `Only ${skillCount} skills listed`,
+        tip: 'Include at least 5 key industry skills to match common job description keywords.',
+        tab: 'skills',
+        focus: 'skillInput'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: `${skillCount} skills keywords added`,
+        tip: 'Excellent! Your resume has good keyword density.'
+      });
+    }
+
+    // Education checks
+    if (resumeData.education.length === 0) {
+      checklist.push({
+        status: 'warning',
+        title: 'No Education listed',
+        tip: 'Many positions require formal degrees or courses. Add your education history.',
+        tab: 'education',
+        focus: 'fullName'
+      });
+    } else {
+      checklist.push({
+        status: 'success',
+        title: 'Education history provided',
+        tip: 'Academic background is clearly detailed.'
+      });
+    }
+
+    // Render HTML
+    container.innerHTML = checklist.map(item => {
+      const icon = item.status === 'success' ? 'fa-circle-check' : (item.status === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-xmark');
+      return `
+        <div class="ats-check-item ${item.status}">
+          <i class="ats-check-icon ${item.status} fas ${icon}"></i>
+          <div class="ats-check-details">
+            <span class="ats-check-title">${item.title}</span>
+            <span class="ats-check-tip">${item.tip}</span>
+            ${item.status !== 'success' && item.tab ? `
+              <button class="ats-btn-fix" data-tab="${item.tab}" data-focus="${item.focus}">
+                <i class="fas fa-wrench"></i> Fix It
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Bind click events on Fix It buttons
+    container.querySelectorAll('.ats-btn-fix').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab');
+        const focusId = btn.getAttribute('data-focus');
+
+        // Close modal
+        $('#atsModal').classList.remove('active');
+
+        // Click sidebar tab
+        const tabEl = $(`.sidebar-tab[data-tab="${tabName}"]`);
+        if (tabEl) tabEl.click();
+
+        // Focus input
+        setTimeout(() => {
+          const targetInput = document.getElementById(focusId);
+          if (targetInput) {
+            targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetInput.focus();
+            targetInput.classList.add('highlight-glow');
+            setTimeout(() => targetInput.classList.remove('highlight-glow'), 2200);
+          }
+        }, 300);
+      });
+    });
   }
 
 
@@ -1001,6 +1275,10 @@
      POPULATE FORM FROM DATA (Restore)
      ───────────────────────────────────────────────────── */
   function populateFormFromData() {
+    // Document title
+    const docTitleInput = $('#docTitle');
+    if (docTitleInput) docTitleInput.value = resumeData.documentTitle || 'My Resume';
+
     // Personal fields
     const personalFields = ['fullName', 'jobTitle', 'email', 'phone', 'address', 'website', 'linkedin', 'github'];
     personalFields.forEach(field => {
@@ -1042,11 +1320,31 @@
   /* ─────────────────────────────────────────────────────
      AUTO-SAVE
      ───────────────────────────────────────────────────── */
+  function updateCloudStatus(status) {
+    const el = $('#cloudSaveStatus');
+    if (!el) return;
+    if (status === 'saving') {
+      el.classList.add('saving');
+      const span = el.querySelector('span');
+      if (span) span.textContent = 'Saving...';
+      const icon = el.querySelector('i');
+      if (icon) icon.className = 'fas fa-sync';
+    } else {
+      el.classList.remove('saving');
+      const span = el.querySelector('span');
+      if (span) span.textContent = 'Saved';
+      const icon = el.querySelector('i');
+      if (icon) icon.className = 'fas fa-cloud';
+    }
+  }
+
   function scheduleAutoSave() {
     clearTimeout(autoSaveTimer);
+    updateCloudStatus('saving');
     autoSaveTimer = setTimeout(() => {
       StorageManager.saveData(resumeData);
       pushUndoState();
+      updateCloudStatus('saved');
       showToast();
     }, AUTO_SAVE_DELAY);
   }
@@ -1056,6 +1354,100 @@
     if (!toast) return;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  /* ─────────────────────────────────────────────────────
+     SAAS TABS & ONBOARDING / TOOLBAR LOGIC
+     ───────────────────────────────────────────────────── */
+  function initSidebarTabs() {
+    const tabs = $$('.sidebar-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const activeTab = tab.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show/hide sections
+        $$('.form-section').forEach(sec => {
+          const secName = sec.getAttribute('data-section');
+          if (activeTab === 'extras') {
+            const extras = ['projects', 'certifications', 'languages', 'social'];
+            if (extras.includes(secName)) {
+              sec.classList.remove('tab-hidden');
+            } else {
+              sec.classList.add('tab-hidden');
+            }
+          } else {
+            if (secName === activeTab) {
+              sec.classList.remove('tab-hidden');
+            } else {
+              sec.classList.add('tab-hidden');
+            }
+          }
+        });
+      });
+    });
+    
+    // Initialize active tab
+    $('.sidebar-tab.active')?.click();
+  }
+
+  function initSidebarToolbar() {
+    $('#btnStartFresh')?.addEventListener('click', () => {
+      if (confirm('Are you sure you want to start fresh? This will clear all your inputs.')) {
+        startFresh();
+      }
+    });
+
+    $('#btnLoadSample')?.addEventListener('click', () => {
+      if (confirm('Are you sure you want to load sample data? This will overwrite your current details.')) {
+        loadSampleData();
+      }
+    });
+  }
+
+  function startFresh() {
+    resumeData = StorageManager.getDefaults();
+    StorageManager.saveData(resumeData);
+    populateFormFromData();
+    onDataChange();
+    pushUndoState();
+  }
+
+  function loadSampleData() {
+    resumeData = StorageManager.getSampleData();
+    StorageManager.saveData(resumeData);
+    populateFormFromData();
+    onDataChange();
+    pushUndoState();
+  }
+
+  function initOnboarding() {
+    const visited = localStorage.getItem('resumeforge_visited');
+    const modal = $('#onboardingModal');
+    if (!modal) return;
+
+    if (!visited) {
+      modal.classList.add('active');
+    }
+
+    $('#onboardingStartFresh')?.addEventListener('click', () => {
+      startFresh();
+      localStorage.setItem('resumeforge_visited', 'true');
+      modal.classList.remove('active');
+    });
+
+    $('#onboardingLoadSample')?.addEventListener('click', () => {
+      loadSampleData();
+      localStorage.setItem('resumeforge_visited', 'true');
+      modal.classList.remove('active');
+    });
+
+    $('#onboardingImport')?.addEventListener('click', () => {
+      modal.classList.remove('active');
+      localStorage.setItem('resumeforge_visited', 'true');
+      $('#btnImportJSON')?.click();
+    });
   }
 
 

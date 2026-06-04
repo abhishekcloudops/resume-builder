@@ -27,6 +27,13 @@
         <div class="logo-icon"><i class="fas fa-file-lines"></i></div>
         <span class="logo-text">Resume<span class="logo-accent">Forge</span> AI</span>
       </div>
+      <div class="header-divider d-none d-sm-block"></div>
+      <div class="doc-title-container d-none d-sm-flex">
+        <input type="text" id="docTitle" class="doc-title-input" value="My Resume" placeholder="Untitled Resume" title="Rename Resume" />
+        <span class="cloud-save-status" id="cloudSaveStatus" title="Changes auto-saved to cloud">
+          <i class="fas fa-cloud"></i> <span>Saved</span>
+        </span>
+      </div>
     </div>
 
     <div class="header-center d-none d-md-flex">
@@ -132,6 +139,75 @@
     </div>
   </div>
 
+  <!-- ═══════════════════ ATS SCORE OPTIMIZATION MODAL ═══════════════════ -->
+  <div class="modal-overlay" id="atsModal">
+    <div class="modal-glass modal-sm">
+      <div class="modal-header-bar">
+        <h2><i class="fas fa-chart-line"></i> ATS Optimization Panel</h2>
+        <button class="btn-icon" id="closeAtsModal"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="modal-body-content">
+        <div class="text-center mb-4">
+          <div class="ats-ring" style="width: 80px; height: 80px; margin: 0 auto 10px; font-size: 1.25rem; cursor: default !important;">
+            <svg viewBox="0 0 36 36" style="width: 80px; height: 80px;">
+              <path class="ats-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="ats-ring-fg" id="atsRingFgModalAts" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span class="ats-value" id="atsValueModalAts" style="font-size: 18px;">0</span>
+          </div>
+          <h4 class="mt-2" id="atsScoreLabel">ATS Compatibility Score</h4>
+          <p class="text-secondary" style="font-size:0.85rem">Improve your score by following the recommendations below.</p>
+        </div>
+        <div class="ats-checklist" id="atsChecklist">
+          <!-- Dynamically generated checklist -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ ONBOARDING WELCOME WIZARD ═══════════════════ -->
+  <div class="modal-overlay" id="onboardingModal">
+    <div class="modal-glass modal-sm text-center">
+      <div class="modal-body-content py-5">
+        <div class="onboarding-logo mb-3">
+          <div class="logo-icon mx-auto" style="width: 50px; height: 50px; font-size: 22px;">
+            <i class="fas fa-file-lines"></i>
+          </div>
+        </div>
+        <h2 class="mb-2 fw-bold text-gradient">Welcome to ResumeForge AI</h2>
+        <p class="text-secondary px-3 mb-4" style="font-size:0.9rem">Create an ATS-optimized, high-fidelity resume in minutes. Choose how you would like to start today:</p>
+        
+        <div class="onboarding-cards d-flex flex-column gap-3 mb-4">
+          <div class="onboarding-card text-start" id="onboardingStartFresh" style="cursor:pointer">
+            <div class="card-icon text-danger" style="font-size: 20px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-signature"></i></div>
+            <div class="card-details text-start">
+              <h5 class="mb-1" style="font-size: 0.95rem; font-weight: 600;">Start from Scratch</h5>
+              <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Begin with a clean, blank slate and input your details step-by-step.</p>
+            </div>
+          </div>
+          
+          <div class="onboarding-card text-start" id="onboardingLoadSample" style="cursor:pointer">
+            <div class="card-icon text-primary" style="font-size: 20px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <div class="card-details text-start">
+              <h5 class="mb-1" style="font-size: 0.95rem; font-weight: 600;">Explore with Sample Data</h5>
+              <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Pre-fill a professional profile to test templates, formatting, and live PDF exports.</p>
+            </div>
+          </div>
+          
+          <div class="onboarding-card text-start" id="onboardingImport" style="cursor:pointer">
+            <div class="card-icon text-success" style="font-size: 20px; width: 40px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-import"></i></div>
+            <div class="card-details text-start">
+              <h5 class="mb-1" style="font-size: 0.95rem; font-weight: 600;">Import Saved Resume</h5>
+              <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Upload a previously saved `.json` file to continue writing.</p>
+            </div>
+          </div>
+        </div>
+        
+        <p class="text-muted" style="font-size: 0.75rem;">Your data is saved automatically in your browser's local storage.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══════════════════ MAIN LAYOUT ═══════════════════ -->
   <main class="app-main">
     <!-- ─── LEFT SIDEBAR FORM ─── -->
@@ -142,6 +218,21 @@
         <button class="btn-icon" id="closeSidebar" aria-label="Close sidebar"><i class="fas fa-xmark"></i></button>
       </div>
       <div class="sidebar-inner" id="sidebarInner">
+        <!-- Sidebar Toolbar (Start Fresh & Load Sample) -->
+        <div class="sidebar-toolbar">
+          <button class="btn-xs btn-outline-danger" id="btnStartFresh"><i class="fas fa-trash-can"></i> Start Fresh</button>
+          <button class="btn-xs btn-outline-primary" id="btnLoadSample"><i class="fas fa-magic"></i> Load Sample</button>
+        </div>
+
+        <!-- Sidebar Section Category Tabs -->
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-tab="personal" title="Contact & Photo"><i class="fas fa-user"></i> Info</button>
+          <button class="sidebar-tab" data-tab="summary" title="Professional Summary"><i class="fas fa-align-left"></i> Summary</button>
+          <button class="sidebar-tab" data-tab="experience" title="Work Experience"><i class="fas fa-briefcase"></i> Work</button>
+          <button class="sidebar-tab" data-tab="education" title="Education History"><i class="fas fa-graduation-cap"></i> Edu</button>
+          <button class="sidebar-tab" data-tab="skills" title="Skills Tags"><i class="fas fa-star"></i> Skills</button>
+          <button class="sidebar-tab" data-tab="extras" title="Projects & Other Info"><i class="fas fa-ellipsis"></i> Extras</button>
+        </div>
 
         <!-- ─── Section: Personal Info ─── -->
         <div class="form-section" data-section="personal" id="sectionPersonal">
