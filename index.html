@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeForge AI — Professional Resume Builder</title>
+  <meta name="description" content="Build stunning, ATS-friendly resumes with ResumeForge AI. Choose from premium templates, get live previews, and download high-quality PDFs instantly." />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome 6 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/templates.css" />
+</head>
+<body>
+  <!-- ═══════════════════ TOP HEADER BAR ═══════════════════ -->
+  <header class="app-header" id="appHeader">
+    <div class="header-left">
+      <button class="btn-icon sidebar-toggle d-xl-none" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">
+        <div class="logo-icon"><i class="fas fa-file-lines"></i></div>
+        <span class="logo-text">Resume<span class="logo-accent">Forge</span> AI</span>
+      </div>
+    </div>
+
+    <div class="header-center d-none d-md-flex">
+      <div class="template-selector-wrap">
+        <button class="btn-glass btn-template-gallery" id="btnTemplateGallery" title="Choose Template">
+          <i class="fas fa-swatchbook"></i>
+          <span class="d-none d-md-inline">Templates</span>
+        </button>
+      </div>
+      <div class="ats-score-badge" id="atsBadge" title="ATS Score">
+        <div class="ats-ring">
+          <svg viewBox="0 0 36 36">
+            <path class="ats-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="ats-ring-fg" id="atsRingFg" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <span class="ats-value" id="atsValue">0</span>
+        </div>
+        <span class="ats-label d-none d-sm-inline">ATS</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="btn-icon d-none d-md-inline-flex" id="btnUndo" title="Undo (Ctrl+Z)" disabled><i class="fas fa-rotate-left"></i></button>
+      <button class="btn-icon d-none d-md-inline-flex" id="btnRedo" title="Redo (Ctrl+Y)" disabled><i class="fas fa-rotate-right"></i></button>
+      <div class="header-divider d-none d-md-block"></div>
+      <button class="btn-icon d-none d-md-inline-flex" id="btnImportJSON" title="Import JSON"><i class="fas fa-file-import"></i></button>
+      <button class="btn-icon d-none d-md-inline-flex" id="btnExportJSON" title="Export JSON"><i class="fas fa-file-export"></i></button>
+      <div class="header-divider d-none d-md-block"></div>
+      <button class="btn-icon d-none d-md-inline-flex" id="btnPrint" title="Print Resume"><i class="fas fa-print"></i></button>
+      
+      <!-- Mobile more actions dropdown -->
+      <div class="dropdown d-md-none">
+        <button class="btn-icon" id="btnMoreActions" data-bs-toggle="dropdown" aria-expanded="false" title="More Actions">
+          <i class="fas fa-ellipsis-vertical"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end glass-dropdown" aria-labelledby="btnMoreActions">
+          <li><button class="dropdown-item" id="btnUndoMobile" disabled><i class="fas fa-rotate-left"></i> Undo</button></li>
+          <li><button class="dropdown-item" id="btnRedoMobile" disabled><i class="fas fa-rotate-right"></i> Redo</button></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button class="dropdown-item" id="btnImportJSONMobile"><i class="fas fa-file-import"></i> Import JSON</button></li>
+          <li><button class="dropdown-item" id="btnExportJSONMobile"><i class="fas fa-file-export"></i> Export JSON</button></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button class="dropdown-item" id="btnPrintMobile"><i class="fas fa-print"></i> Print Resume</button></li>
+        </ul>
+      </div>
+
+      <button class="btn-icon theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="btn-glass btn-save" id="btnSave" title="Save Resume">
+        <i class="fas fa-cloud-arrow-up"></i>
+        <span class="d-none d-md-inline">Save</span>
+      </button>
+      <button class="btn-primary-action" id="btnDownloadPDF" title="Download PDF">
+        <i class="fas fa-download"></i>
+        <span>PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ PROGRESS BAR ═══════════════════ -->
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+  </div>
+
+  <!-- ═══════════════════ AUTO-SAVE TOAST ═══════════════════ -->
+  <div class="autosave-toast" id="autosaveToast">
+    <i class="fas fa-check-circle"></i> Auto-saved
+  </div>
+
+  <!-- ═══════════════════ TEMPLATE GALLERY MODAL ═══════════════════ -->
+  <div class="modal-overlay" id="templateModal">
+    <div class="modal-glass">
+      <div class="modal-header-bar">
+        <h2><i class="fas fa-palette"></i> Choose Your Template</h2>
+        <button class="btn-icon" id="closeTemplateModal"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="template-grid" id="templateGrid">
+        <!-- Templates injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ IMPORT JSON MODAL ═══════════════════ -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal-glass modal-sm">
+      <div class="modal-header-bar">
+        <h2><i class="fas fa-file-import"></i> Import Resume Data</h2>
+        <button class="btn-icon" id="closeImportModal"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="modal-body-content">
+        <textarea class="form-control glass-input" id="importTextarea" rows="10" placeholder="Paste your JSON data here..."></textarea>
+        <div class="d-flex gap-2 mt-3">
+          <label class="btn-glass flex-grow-1 text-center" style="cursor:pointer">
+            <i class="fas fa-folder-open"></i> Load File
+            <input type="file" accept=".json" id="importFileInput" hidden />
+          </label>
+          <button class="btn-primary-action flex-grow-1" id="btnDoImport">
+            <i class="fas fa-check"></i> Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ MAIN LAYOUT ═══════════════════ -->
+  <main class="app-main">
+    <!-- ─── LEFT SIDEBAR FORM ─── -->
+    <aside class="sidebar" id="sidebar">
+      <!-- Mobile Sidebar Header -->
+      <div class="sidebar-mobile-header d-xl-none">
+        <h4>Edit Details</h4>
+        <button class="btn-icon" id="closeSidebar" aria-label="Close sidebar"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="sidebar-inner" id="sidebarInner">
+
+        <!-- ─── Section: Personal Info ─── -->
+        <div class="form-section" data-section="personal" id="sectionPersonal">
+          <div class="section-header" data-toggle="sectionPersonalBody">
+            <div class="section-icon"><i class="fas fa-user"></i></div>
+            <h3>Personal Information</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionPersonalBody">
+            <div class="photo-upload-area">
+              <label for="photoUpload" class="photo-label" id="photoLabel">
+                <div class="photo-preview" id="photoPreview">
+                  <i class="fas fa-camera"></i>
+                  <span>Upload Photo</span>
+                </div>
+              </label>
+              <input type="file" id="photoUpload" accept="image/*" hidden />
+              <button class="btn-xs btn-danger-subtle" id="removePhoto" style="display:none">
+                <i class="fas fa-trash"></i> Remove
+              </button>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" class="glass-input" id="fullName" placeholder="John Doe" data-field="fullName" />
+              </div>
+              <div class="form-group">
+                <label for="jobTitle">Job Title</label>
+                <input type="text" class="glass-input" id="jobTitle" placeholder="Senior Software Engineer" data-field="jobTitle" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="glass-input" id="email" placeholder="john@example.com" data-field="email" />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" class="glass-input" id="phone" placeholder="+1 (555) 123-4567" data-field="phone" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" class="glass-input" id="address" placeholder="San Francisco, CA" data-field="address" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="website">Website</label>
+                <input type="url" class="glass-input" id="website" placeholder="https://johndoe.dev" data-field="website" />
+              </div>
+              <div class="form-group">
+                <label for="linkedin">LinkedIn</label>
+                <input type="url" class="glass-input" id="linkedin" placeholder="https://linkedin.com/in/johndoe" data-field="linkedin" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="github">GitHub</label>
+              <input type="url" class="glass-input" id="github" placeholder="https://github.com/johndoe" data-field="github" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Section: Summary ─── -->
+        <div class="form-section" data-section="summary" id="sectionSummary">
+          <div class="section-header" data-toggle="sectionSummaryBody">
+            <div class="section-icon"><i class="fas fa-align-left"></i></div>
+            <h3>Professional Summary</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionSummaryBody">
+            <div class="form-group">
+              <textarea class="glass-input" id="summary" rows="4" placeholder="Passionate software engineer with 5+ years of experience..." data-field="summary"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Section: Skills ─── -->
+        <div class="form-section" data-section="skills" id="sectionSkills">
+          <div class="section-header" data-toggle="sectionSkillsBody">
+            <div class="section-icon"><i class="fas fa-star"></i></div>
+            <h3>Skills</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionSkillsBody">
+            <div class="skills-input-wrap">
+              <input type="text" class="glass-input" id="skillInput" placeholder="Type a skill and press Enter" />
+              <button class="btn-add-inline" id="btnAddSkill"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="skills-tags" id="skillsTags"></div>
+          </div>
+        </div>
+
+        <!-- ─── Section: Experience ─── -->
+        <div class="form-section" data-section="experience" id="sectionExperience">
+          <div class="section-header" data-toggle="sectionExperienceBody">
+            <div class="section-icon"><i class="fas fa-briefcase"></i></div>
+            <h3>Experience</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionExperienceBody">
+            <div id="experienceEntries"></div>
+            <button class="btn-add-entry" id="btnAddExperience">
+              <i class="fas fa-plus-circle"></i> Add Experience
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── Section: Education ─── -->
+        <div class="form-section" data-section="education" id="sectionEducation">
+          <div class="section-header" data-toggle="sectionEducationBody">
+            <div class="section-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Education</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionEducationBody">
+            <div id="educationEntries"></div>
+            <button class="btn-add-entry" id="btnAddEducation">
+              <i class="fas fa-plus-circle"></i> Add Education
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── Section: Projects ─── -->
+        <div class="form-section" data-section="projects" id="sectionProjects">
+          <div class="section-header" data-toggle="sectionProjectsBody">
+            <div class="section-icon"><i class="fas fa-diagram-project"></i></div>
+            <h3>Projects</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionProjectsBody">
+            <div id="projectEntries"></div>
+            <button class="btn-add-entry" id="btnAddProject">
+              <i class="fas fa-plus-circle"></i> Add Project
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── Section: Certifications ─── -->
+        <div class="form-section" data-section="certifications" id="sectionCertifications">
+          <div class="section-header" data-toggle="sectionCertificationsBody">
+            <div class="section-icon"><i class="fas fa-certificate"></i></div>
+            <h3>Certifications</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionCertificationsBody">
+            <div id="certEntries"></div>
+            <button class="btn-add-entry" id="btnAddCert">
+              <i class="fas fa-plus-circle"></i> Add Certification
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── Section: Languages ─── -->
+        <div class="form-section" data-section="languages" id="sectionLanguages">
+          <div class="section-header" data-toggle="sectionLanguagesBody">
+            <div class="section-icon"><i class="fas fa-language"></i></div>
+            <h3>Languages</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionLanguagesBody">
+            <div id="langEntries"></div>
+            <button class="btn-add-entry" id="btnAddLang">
+              <i class="fas fa-plus-circle"></i> Add Language
+            </button>
+          </div>
+        </div>
+
+        <!-- ─── Section: Social Links ─── -->
+        <div class="form-section" data-section="social" id="sectionSocial">
+          <div class="section-header" data-toggle="sectionSocialBody">
+            <div class="section-icon"><i class="fas fa-share-nodes"></i></div>
+            <h3>Social Links</h3>
+            <span class="section-toggle"><i class="fas fa-chevron-up"></i></span>
+          </div>
+          <div class="section-body" id="sectionSocialBody">
+            <div id="socialEntries"></div>
+            <button class="btn-add-entry" id="btnAddSocial">
+              <i class="fas fa-plus-circle"></i> Add Social Link
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ─── Sidebar Overlay (mobile) ─── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ─── RIGHT: PREVIEW ─── -->
+    <section class="preview-area" id="previewArea">
+      <div class="preview-toolbar">
+        <div class="preview-zoom">
+          <button class="btn-icon btn-sm" id="zoomOut" title="Zoom Out"><i class="fas fa-minus"></i></button>
+          <span class="zoom-value" id="zoomValue">100%</span>
+          <button class="btn-icon btn-sm" id="zoomIn" title="Zoom In"><i class="fas fa-plus"></i></button>
+          <button class="btn-icon btn-sm" id="zoomFit" title="Fit to View"><i class="fas fa-expand"></i></button>
+        </div>
+
+        <!-- Mobile-only tools in preview toolbar -->
+        <div class="preview-mobile-tools d-md-none d-flex align-items-center gap-2">
+          <button class="btn-glass btn-sm btn-template-gallery-mobile" id="btnTemplateGalleryMobile" title="Choose Template">
+            <i class="fas fa-swatchbook"></i>
+            <span>Templates</span>
+          </button>
+          <div class="ats-score-badge btn-sm" id="atsBadgeMobile" title="ATS Score" style="padding: 2px 8px; font-size: 0.75rem;">
+            <div class="ats-ring" style="width: 24px; height: 24px;">
+              <svg viewBox="0 0 36 36">
+                <path class="ats-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="ats-ring-fg" id="atsRingFgMobile" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <span class="ats-value" id="atsValueMobile" style="font-size: 7px;">0</span>
+            </div>
+            <span class="ats-label">ATS</span>
+          </div>
+        </div>
+
+        <div class="preview-info">
+          <span class="page-indicator" id="pageIndicator">Page 1</span>
+        </div>
+      </div>
+      <div class="preview-scroll" id="previewScroll">
+        <div class="preview-canvas-wrap" id="previewCanvasWrap">
+          <div class="resume-page" id="resumePreview">
+            <!-- Template content rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════ HIDDEN FILE INPUT ═══════════════════ -->
+  <input type="file" id="importFileHidden" accept=".json" hidden />
+
+  <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+
+  <script src="js/storage.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/pdf.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
