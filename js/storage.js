@@ -14,24 +14,85 @@ const StorageManager = (() => {
   function getDefaults() {
     return {
       personal: {
-        fullName: '',
-        jobTitle: '',
-        email: '',
-        phone: '',
-        address: '',
+        fullName: 'Ankita Kumari',
+        jobTitle: 'Supply Chain & Logistics Specialist',
+        email: 'theankitasharmacre@gmail.com',
+        phone: '+91-8825215811',
+        address: 'Patna, Bihar',
         website: '',
-        linkedin: '',
+        linkedin: 'https://linkedin.com/in/ankita-sharma-77222b180',
         github: '',
-        photo: '' // base64
+        photo: 'assets/images/ankita.jpg'
       },
-      summary: '',
-      skills: [],
-      experience: [],
-      education: [],
+      summary: 'Detail-oriented Supply Chain Professional experienced in international freight operations across USA and Canada. Skilled in FTL/LTL, drayage logistics, SAP, CRM systems, and advanced Excel. Proven ability to onboard new clients, improve shipment volume, and maintain strong customer relationships.',
+      skills: [
+        'Freight Operations',
+        'SAP ERP & CRM',
+        'FTL / LTL & Drayage',
+        'Advanced Excel & Office',
+        'CRM Management',
+        'Client Relationship'
+      ],
+      experience: [
+        {
+          position: 'Business Development Executive',
+          company: 'Unify Logistic Solutions',
+          location: 'USA Operations',
+          startDate: 'Mar 2025',
+          endDate: 'Present',
+          responsibilities: 'Onboarded 20+ clients\nManaged USA transportation\nCoordinated FTL/LTL and drayage shipments\nExceeded business development targets'
+        },
+        {
+          position: 'Inside Sales Executive',
+          company: 'DeHaat',
+          location: 'Patna, Bihar',
+          startDate: 'Nov 2024',
+          endDate: 'Mar 2025',
+          responsibilities: 'Generated and converted leads\nAchieved sales targets\nBuilt customer relationships\nManaged post-sales support'
+        },
+        {
+          position: 'Customer Service Specialist',
+          company: 'Alorica',
+          location: 'Customer Support Division',
+          startDate: 'Mar 2023',
+          endDate: 'Mar 2024',
+          responsibilities: 'Handled customer support\nProcessed accounts\nGenerated 100+ leads monthly\nContributed to a 35% performance improvement'
+        }
+      ],
+      education: [
+        {
+          degree: 'Bachelor of Commerce',
+          school: 'Patna University',
+          startYear: '2020',
+          endYear: '2023',
+          description: 'Specialized in accounting and finance. Participated in debates and cultural events.'
+        }
+      ],
       projects: [],
-      certifications: [],
-      languages: [],
-      social: []
+      certifications: [
+        {
+          name: 'Supply Chain Foundations - LinkedIn Learning'
+        },
+        {
+          name: 'Advanced Google Excel Certificate'
+        }
+      ],
+      languages: [
+        {
+          name: 'Hindi',
+          level: 'Native'
+        },
+        {
+          name: 'English',
+          level: 'C1 Advanced'
+        }
+      ],
+      social: [
+        {
+          platform: 'LinkedIn',
+          url: 'https://linkedin.com/in/ankita-sharma-77222b180'
+        }
+      ]
     };
   }
 
