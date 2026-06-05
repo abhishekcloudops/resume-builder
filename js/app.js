@@ -57,6 +57,7 @@
     initSidebarToolbar();
     initOnboarding();
     initAtsModal();
+    initAiAutofillModal();
 
     // Set initial doc title value
     const docTitleInput = $('#docTitle');
@@ -1510,6 +1511,90 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     AI AUTOFILL WIDGET
+     ───────────────────────────────────────────────────── */
+  function initAiAutofillModal() {
+    const modal = $('#aiAutofillModal');
+    const btnOpen = $('#btnAiAutofill');
+    const btnClose = $('#closeAiAutofillModal');
+    const btnDoAutofill = $('#btnDoAiAutofill');
+    const apiKeyInput = $('#aiApiKey');
+    const rawInput = $('#aiRawInput');
+    const loaderOverlay = $('#aiLoaderOverlay');
+    const stepText = $('#aiStepText');
+
+    if (!modal) return;
+
+    // Load saved API key on open
+    const openModal = () => {
+      const savedKey = localStorage.getItem('resumeforge_gemini_key') || '';
+      if (apiKeyInput) apiKeyInput.value = savedKey;
+      modal.classList.add('active');
+    };
+
+    btnOpen?.addEventListener('click', openModal);
+    btnClose?.addEventListener('click', () => {
+      // Hide loader and close modal
+      if (loaderOverlay) loaderOverlay.style.display = 'none';
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal && loaderOverlay && loaderOverlay.style.display === 'none') {
+        modal.classList.remove('active');
+      }
+    });
+
+    btnDoAutofill?.addEventListener('click', async () => {
+      const apiKey = apiKeyInput.value.trim();
+      const rawText = rawInput.value.trim();
+
+      if (!apiKey) {
+        alert('Please enter your Gemini API key to proceed. You can get one for free at Google AI Studio.');
+        apiKeyInput.focus();
+        return;
+      }
+      if (!rawText) {
+        alert('Please paste some text describing your career background.');
+        rawInput.focus();
+        return;
+      }
+
+      // Save key in localStorage
+      localStorage.setItem('resumeforge_gemini_key', apiKey);
+
+      // Show loader
+      if (loaderOverlay) loaderOverlay.style.display = 'flex';
+
+      try {
+        const parsedData = await AIManager.parseResume(apiKey, rawText, (step) => {
+          if (stepText) stepText.textContent = step;
+        });
+
+        // Update resume data
+        resumeData = { ...StorageManager.getDefaults(), ...parsedData };
+        StorageManager.saveData(resumeData);
+        populateFormFromData();
+        onDataChange();
+        pushUndoState();
+
+        // Clear input text
+        if (rawInput) rawInput.value = '';
+
+        // Success notification
+        alert('Success! Your resume details have been automatically extracted and populated.');
+
+        // Close modal
+        modal.classList.remove('active');
+      } catch (err) {
+        alert(`AI Parsing failed: ${err.message}`);
+      } finally {
+        if (loaderOverlay) loaderOverlay.style.display = 'none';
+      }
+    });
   }
 
 })();

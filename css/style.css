@@ -1440,3 +1440,56 @@ textarea.glass-input {
     border-color: var(--border);
   }
 }
+
+/* ─── AI Autofill Assistant Styles ─── */
+.btn-outline-purple {
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #7c3aed;
+}
+.btn-outline-purple:hover {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+.text-purple {
+  color: #7c3aed !important;
+}
+
+/* AI loader steps overlay */
+.ai-loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+.ai-spinner {
+  width: 44px; height: 44px;
+  border: 4px solid var(--border-strong);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: ai-spin-anim 0.8s linear infinite;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.15);
+}
+@keyframes ai-spin-anim {
+  to { transform: rotate(360deg); }
+}
+.ai-step-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  animation: ai-pulse-anim 1.5s ease-in-out infinite;
+}
+@keyframes ai-pulse-anim {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
