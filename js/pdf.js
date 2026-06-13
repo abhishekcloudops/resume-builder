@@ -29,7 +29,7 @@ const PDFGenerator = (() => {
   }
 
   /**
-   * Generate and download resume as PDF
+   * Generate and download resume as PDF (Text format via Print Dialog)
    */
   async function downloadPDF() {
     const resumeEl = document.getElementById('resumePreview');
@@ -37,111 +37,9 @@ const PDFGenerator = (() => {
       alert('No resume preview found. Please fill in your details first.');
       return;
     }
-
-    // Check if libraries are loaded
-    if (typeof html2canvas === 'undefined') {
-      alert('PDF library (html2canvas) failed to load. Please check your internet connection and refresh the page.');
-      return;
-    }
-
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      alert('PDF library (jsPDF) failed to load. Please check your internet connection and refresh the page.');
-      return;
-    }
-
-    showLoader();
-
-    try {
-      // Temporarily reset any zoom transform
-      const canvasWrap = document.getElementById('previewCanvasWrap');
-      const prevTransform = canvasWrap ? canvasWrap.style.transform : '';
-      if (canvasWrap) canvasWrap.style.transform = 'none';
-
-      // Apply print formatting class for compact single-page layout
-      resumeEl.classList.add('pdf-printing');
-
-      // Ensure resume is at full width for capture
-      const prevWidth = resumeEl.style.width;
-      resumeEl.style.width = '794px';
-
-      // Wait for fonts/images and reflow to finish
-      await new Promise(r => setTimeout(r, 600));
-
-      const canvas = await html2canvas(resumeEl, {
-        scale: SCALE,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: 794,
-        windowWidth: 794
-      });
-
-      // Restore class and styles
-      resumeEl.classList.remove('pdf-printing');
-      if (canvasWrap) canvasWrap.style.transform = prevTransform;
-      resumeEl.style.width = prevWidth;
-
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const imgW = canvas.width;
-      const imgH = canvas.height;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Scale the image proportionally to fit exactly on ONE A4 page
-      const canvasRatio = imgW / imgH;
-      const a4Ratio = A4_W_MM / A4_H_MM; // 210 / 297 = 0.707
-
-      let printW = A4_W_MM;
-      let printH = A4_H_MM;
-      let xOffset = 0;
-      let yOffset = 0;
-
-      if (canvasRatio < a4Ratio) {
-        // Canvas is taller than the A4 page ratio
-        printH = A4_H_MM;
-        printW = A4_H_MM * canvasRatio;
-        xOffset = (A4_W_MM - printW) / 2;
-      } else {
-        // Canvas is wider than the A4 page ratio
-        printW = A4_W_MM;
-        printH = A4_W_MM / canvasRatio;
-        yOffset = (A4_H_MM - printH) / 2;
-      }
-
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, printW, printH, undefined, 'FAST');
-
-      // Use document title if available, otherwise fallback to name
-      const data = StorageManager.loadData();
-      const nameEl = resumeEl.querySelector('h1');
-      let filename = 'resume';
-      if (data && data.documentTitle && data.documentTitle !== 'My Resume') {
-        filename = data.documentTitle.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-      } else if (nameEl && nameEl.textContent.trim() && nameEl.textContent.trim() !== 'Your Name') {
-        filename = nameEl.textContent.trim().replace(/\s+/g, '_') + '_Resume';
-      } else if (data && data.documentTitle) {
-        filename = data.documentTitle.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-      }
-      pdf.save(`${filename}.pdf`);
-
-    } catch (err) {
-      console.error('PDF generation failed:', err);
-      // Clean up in case of error
-      resumeEl.classList.remove('pdf-printing');
-      const canvasWrap = document.getElementById('previewCanvasWrap');
-      if (canvasWrap) {
-        canvasWrap.style.transform = '';
-      }
-      alert('PDF generation failed. Trying print dialog as fallback...');
-      window.print();
-    } finally {
-      hideLoader();
-    }
+    
+    alert('To download a readable text PDF (ATS-friendly), please select "Save as PDF" in the print dialog.');
+    window.print();
   }
 
   /**
@@ -150,6 +48,21 @@ const PDFGenerator = (() => {
   function printResume() {
     window.print();
   }
+
+  // Ensure print formatting is applied when the print dialog is opened
+  window.addEventListener('beforeprint', () => {
+    const resumeEl = document.getElementById('resumePreview');
+    if (resumeEl) {
+      resumeEl.classList.add('pdf-printing');
+    }
+  });
+
+  window.addEventListener('afterprint', () => {
+    const resumeEl = document.getElementById('resumePreview');
+    if (resumeEl) {
+      resumeEl.classList.remove('pdf-printing');
+    }
+  });
 
   return { downloadPDF, printResume };
 })();

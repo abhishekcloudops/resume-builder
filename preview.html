@@ -338,77 +338,8 @@ Detail-oriented Supply Chain Professional experienced in international freight o
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
   document.getElementById('btn-download').addEventListener('click', function() {
-    const btn = this;
-    const originalText = btn.innerHTML;
-    
-    try {
-      if (typeof html2pdf === 'undefined') {
-        throw new ReferenceError('html2pdf library is not loaded');
-      }
-
-      const element = document.querySelector('.resume');
-      
-      // Set loading state
-      btn.innerHTML = `<svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite; margin-right: 8px;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg> Generating...`;
-      btn.style.opacity = '0.7';
-      btn.disabled = true;
-
-      // Apply print formatting class
-      element.classList.add('html2pdf-printing');
-
-      // Wait for reflow after class change
-      setTimeout(() => {
-        const opt = {
-          margin: 0,
-          filename: 'Ankita_Kumari_Resume.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { 
-            scale: 2, 
-            useCORS: true,
-            logging: false,
-            letterRendering: true,
-            width: 794,
-            height: 1123,
-            scrollY: 0,
-            scrollX: 0
-          },
-          jsPDF: { 
-            unit: 'px', 
-            format: [794, 1123],
-            orientation: 'portrait',
-            hotfixes: ['px_scaling']
-          },
-          pagebreak: { mode: 'avoid-all' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-          element.classList.remove('html2pdf-printing');
-          btn.innerHTML = originalText;
-          btn.style.opacity = '1';
-          btn.disabled = false;
-        }).catch(err => {
-          console.error(err);
-          element.classList.remove('html2pdf-printing');
-          btn.innerHTML = originalText;
-          btn.style.opacity = '1';
-          btn.disabled = false;
-          alert('Direct PDF generation failed. Opening print dialog as fallback - please select "Save as PDF"!');
-          window.print();
-        });
-      }, 200);
-
-    } catch (err) {
-      console.error(err);
-      const element = document.querySelector('.resume');
-      if (element) {
-        element.classList.remove('html2pdf-printing');
-      }
-      btn.innerHTML = originalText;
-      btn.style.opacity = '1';
-      btn.disabled = false;
-      alert('The download library is offline or failed to load. Opening the print dialog as a fallback — please choose "Save as PDF" as the destination!');
-      window.print();
-    }
+    alert('To download a readable text PDF (ATS-friendly), please select "Save as PDF" in the print dialog.');
+    window.print();
   });
 
   document.getElementById('btn-print').addEventListener('click', function() {

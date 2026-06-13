@@ -1100,6 +1100,20 @@ textarea.glass-input {
 
 /* Print */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
   .app-header, .sidebar, .preview-toolbar, .progress-bar-wrap,
   .autosave-toast, .modal-overlay, .sidebar-overlay {
     display: none !important;

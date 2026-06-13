@@ -235,6 +235,8 @@
 .tpl-executive-gold {
   padding: 0;
   min-height: 1123px;
+  display: flex;
+  flex-direction: column;
 }
 .tpl-executive-gold .tpl-header {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -278,6 +280,7 @@
 .tpl-executive-gold .tpl-body {
   display: flex;
   padding: 0;
+  flex: 1;
 }
 .tpl-executive-gold .tpl-body-main {
   flex: 1;
@@ -366,6 +369,8 @@
    ═══════════════════════════════════════════════════════ */
 .tpl-creative-designer {
   min-height: 1123px;
+  display: flex;
+  flex-direction: column;
 }
 .tpl-creative-designer .tpl-hero {
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -414,6 +419,7 @@
 }
 .tpl-creative-designer .tpl-body {
   padding: 28px 36px;
+  flex: 1;
 }
 .tpl-creative-designer .resume-section-title {
   color: #667eea;
@@ -433,6 +439,8 @@
    ═══════════════════════════════════════════════════════ */
 .tpl-corporate {
   min-height: 1123px;
+  display: flex;
+  flex-direction: column;
 }
 .tpl-corporate .tpl-header {
   background: #0a66c2;
@@ -463,6 +471,7 @@
 }
 .tpl-corporate .tpl-body {
   display: flex;
+  flex: 1;
 }
 .tpl-corporate .tpl-body-main {
   flex: 1;
